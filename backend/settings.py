@@ -74,6 +74,11 @@ FRONTEND_URL = os.environ.get(
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
+    'https://smart-quiz-portal.vercel.app',
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://smart-quiz-portal-[a-z0-9]+-chetan-chowdarys-projects\.vercel\.app$',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
