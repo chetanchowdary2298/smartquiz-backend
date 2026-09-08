@@ -1,12 +1,14 @@
-"""
-Django settings for backend project.
-"""
+
 
 import os
 from pathlib import Path
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
+# ============================================================
+# BUILD PATHS
+# ============================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -19,11 +21,18 @@ SECRET_KEY = os.environ.get(
     'dev-only-secret-key'
 )
 
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get(
+    'DEBUG',
+    'False'
+).lower() == 'true'
+
 
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    for host in os.environ.get(
+        'ALLOWED_HOSTS',
+        'localhost,127.0.0.1'
+    ).split(',')
     if host.strip()
 ]
 
@@ -42,6 +51,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
+
     'accounts',
 ]
 
@@ -52,11 +62,15 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
+    # CORS middleware must be near the top
     'corsheaders.middleware.CorsMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -64,7 +78,7 @@ MIDDLEWARE = [
 
 
 # ============================================================
-# CORS
+# CORS CONFIGURATION
 # ============================================================
 
 FRONTEND_URL = os.environ.get(
@@ -72,16 +86,35 @@ FRONTEND_URL = os.environ.get(
     'http://localhost:5173'
 ).rstrip('/')
 
+
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
     'https://smart-quiz-portal.vercel.app',
 ]
 
+
+# Allow Vercel preview deployments
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^https://smart-quiz-portal-[a-z0-9]+-chetan-chowdarys-projects\.vercel\.app$',
 ]
 
+
 CORS_ALLOW_CREDENTIALS = True
+
+
+# ============================================================
+# CSRF TRUSTED ORIGINS
+# ============================================================
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://smart-quiz-portal.vercel.app',
+]
+
+
+# Allow Vercel preview deployments for CSRF
+CSRF_TRUSTED_ORIGINS += [
+    'https://smart-quiz-portal-*.vercel.app',
+]
 
 
 # ============================================================
@@ -98,8 +131,13 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
+
         'APP_DIRS': True,
+
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -110,6 +148,10 @@ TEMPLATES = [
     },
 ]
 
+
+# ============================================================
+# WSGI
+# ============================================================
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -162,14 +204,17 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME':
         'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
+
     {
         'NAME':
         'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
+
     {
         'NAME':
         'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
+
     {
         'NAME':
         'django.contrib.auth.password_validation.NumericPasswordValidator',
@@ -215,8 +260,13 @@ REST_FRAMEWORK = {
 # ============================================================
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(
+        minutes=60
+    ),
+
+    'REFRESH_TOKEN_LIFETIME': timedelta(
+        days=1
+    ),
 }
 
 
@@ -247,4 +297,7 @@ EMAIL_HOST_PASSWORD = os.environ.get(
 # DEFAULT PRIMARY KEY
 # ============================================================
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = (
+    'django.db.models.BigAutoField'
+)
+
