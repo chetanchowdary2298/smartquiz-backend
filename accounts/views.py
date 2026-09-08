@@ -43,7 +43,9 @@ def send_brevo_email(to_email, subject, text_content, html_content):
     api_key = os.environ.get("BREVO_API_KEY")
 
     if not api_key:
-        raise Exception("BREVO_API_KEY is not configured on the server.")
+        raise Exception(
+            "BREVO_API_KEY is not configured on the server."
+        )
 
     payload = {
         "sender": {
@@ -139,13 +141,35 @@ def register(request):
 @permission_classes([AllowAny])
 def login(request):
 
-    username = request.data.get('username')
+    username_or_email = request.data.get('username')
     password = request.data.get('password')
 
+    if not username_or_email or not password:
+        return Response(
+            {
+                'error':
+                'Username/email and password are required.'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # First try normal username login
     user = authenticate(
-        username=username,
+        username=username_or_email,
         password=password
     )
+
+    # If username login fails, try registered email
+    if user is None:
+        user_by_email = User.objects.filter(
+            email__iexact=username_or_email
+        ).first()
+
+        if user_by_email:
+            user = authenticate(
+                username=user_by_email.username,
+                password=password
+            )
 
     if user is not None:
 
@@ -189,6 +213,7 @@ class PasswordResetApiView(APIView):
         if user:
 
             try:
+
                 # ------------------------------------------------
                 # Generate secure UID and password reset token
                 # ------------------------------------------------
@@ -251,6 +276,7 @@ class PasswordResetApiView(APIView):
                     <meta charset="UTF-8">
                     <title>Reset Your SmartQuiz Password</title>
                 </head>
+
                 <body style="
                     margin: 0;
                     padding: 0;
