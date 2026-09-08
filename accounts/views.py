@@ -276,6 +276,11 @@ class QuestionListView(APIView):
             ''
         ).strip()
 
+        topic_name = request.query_params.get(
+            'topic',
+            ''
+        ).strip()
+
         limit = request.query_params.get(
             'limit',
             10
@@ -293,6 +298,11 @@ class QuestionListView(APIView):
             subject__name__iexact=language_name
         )
 
+        if topic_name:
+            queryset = queryset.filter(
+                topic__iexact=topic_name
+            )
+
         questions = queryset.order_by('?')[:limit]
 
         data = []
@@ -307,11 +317,6 @@ class QuestionListView(APIView):
                     1
                 )[-1].strip()
 
-            opt_a = q.option_a
-            opt_b = q.option_b
-            opt_c = q.option_c
-            opt_d = q.option_d
-
             correct_ans_letter = (
                 q.correct_answer.upper().strip()
             )
@@ -321,19 +326,19 @@ class QuestionListView(APIView):
                 "text": cleaned_text,
                 "options": [
                     {
-                        "text": opt_a,
+                        "text": q.option_a,
                         "is_correct": correct_ans_letter == 'A'
                     },
                     {
-                        "text": opt_b,
+                        "text": q.option_b,
                         "is_correct": correct_ans_letter == 'B'
                     },
                     {
-                        "text": opt_c,
+                        "text": q.option_c,
                         "is_correct": correct_ans_letter == 'C'
                     },
                     {
-                        "text": opt_d,
+                        "text": q.option_d,
                         "is_correct": correct_ans_letter == 'D'
                     }
                 ]
@@ -343,8 +348,6 @@ class QuestionListView(APIView):
             data,
             status=status.HTTP_200_OK
         )
-
-
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])

@@ -11,16 +11,21 @@ class Subject(models.Model):
 
 # 2. Questions Table linked directly to a Subject
 class Question(models.Model):
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='questions')
+    subject = models.ForeignKey(
+        Subject,
+        on_delete=models.CASCADE,
+        related_name='questions'
+    )
+    topic = models.CharField(max_length=100)
     text = models.TextField()
     option_a = models.CharField(max_length=200)
     option_b = models.CharField(max_length=200)
     option_c = models.CharField(max_length=200)
     option_d = models.CharField(max_length=200)
-    correct_answer = models.CharField(max_length=1)  # Stored as 'A', 'B', 'C', or 'D'
+    correct_answer = models.CharField(max_length=1)
 
     def __str__(self):
-        return f"[{self.subject.name}] {self.text[:50]}"
+        return f"[{self.subject.name} - {self.topic}] {self.text[:50]}"
 
 # 3. Quiz Score Tracking Table for Students
 class QuizScore(models.Model):
