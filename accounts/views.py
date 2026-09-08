@@ -291,13 +291,17 @@ class QuestionListView(APIView):
 
         try:
             limit = int(limit)
-        except ValueError:
+        except (ValueError, TypeError):
             limit = 10
+
+        # Allow only 1 to 30 questions
+        limit = max(1, min(limit, 30))
 
         queryset = Question.objects.filter(
             subject__name__iexact=language_name
         )
 
+        # Filter questions by topic when a topic is provided
         if topic_name:
             queryset = queryset.filter(
                 topic__iexact=topic_name
@@ -348,6 +352,8 @@ class QuestionListView(APIView):
             data,
             status=status.HTTP_200_OK
         )
+
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
